@@ -1,0 +1,8 @@
+# Directories
+build/
+.vs/
+.vscode/
+bin/
+data/
+
+# Files
