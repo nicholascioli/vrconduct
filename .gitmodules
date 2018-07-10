@@ -1,6 +1,6 @@
 [submodule "lib/bsf"]
 	path = lib/bsf
-	url = https://github.com/gamefoundry/bsf
+	url = https://github.com/GameFoundry/bsf
 [submodule "lib/TinySoundFont"]
 	path = lib/TinySoundFont
 	url = https://github.com/schellingb/TinySoundFont
