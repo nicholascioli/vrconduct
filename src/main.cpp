@@ -11,6 +11,7 @@
 #include "Scene/BsSceneObject.h"
 #include "Utility/BsTime.h"
 
+#include <eye.hpp>
 #include <openvr.h>
 #include <score.hpp>
 
@@ -18,6 +19,9 @@ vr::IVRSystem* g_hmd;
 vr::IVRCompositor* g_compositor;
 
 bs::HSceneObject g_scene;
+
+std::shared_ptr<eye> g_left_eye;
+std::shared_ptr<eye> g_right_eye;
 
 // This program
 class app : public bs::Application {
@@ -55,6 +59,11 @@ public:
 		auto t = bs::Transform(pos, rot, bs::Vector3::ONE);
 		g_scene->setPosition(pos);
 		g_scene->setRotation(rot);
+	}
+
+	void postUpdate() override {
+		g_left_eye->present();
+		g_right_eye->present();
 	}
 };
 
@@ -94,6 +103,13 @@ int main(int argc, char** argv) {
 	g_scene = bs::SceneObject::create("MainCamera");
 	auto lis = g_scene->addComponent<bs::CAudioListener>();
 
+	// Audio enumeration
+	bs::Vector<bs::AudioDevice> devices = bs::gAudio().getAllDevices();
+	for (const auto& dev : devices)
+		std::cout << "Dev: " << dev.name << std::endl;
+	
+	bs::gAudio().setActiveDevice(devices[1]);
+
 	std::vector<bs::HSceneObject> mus;
 	std::vector<bs::GameObjectHandle<bs::CAudioSource>> src;
 
@@ -108,6 +124,10 @@ int main(int argc, char** argv) {
 	for (const auto& s : src) {
 		s->play();
 	}
+
+	auto head      = bs::SceneObject::create("Head");
+	g_left_eye  = std::make_shared<eye>(g_hmd, head, vr::Eye_Left);
+	g_right_eye = std::make_shared<eye>(g_hmd, head, vr::Eye_Right);
 
 	// Clean up
 	bs::Application::instance().runMainLoop();
